@@ -1,0 +1,72 @@
+@startuml
+' left to right direction
+title BlackJackモデリング
+
+hide empty circle
+hide empty members
+
+rectangle 概念図 {
+  class 対象 #CBFDFF
+  class 所持 #DCCBFF
+  class 行動 #CBFFCB
+  class 行動条件 #FFE5E5
+  対象 -- 所持
+  対象 -- 行動
+  行動 -- 行動条件
+}
+
+rectangle オブジェクト図 {
+  class プレイヤー #CBFDFF
+  class 手札 #DCCBFF
+  class hit #CBFFCB
+  class stay #CBFFCB
+  class 合計点数が16以上 #FFE5E5
+  class 合計点数が15以下 #FFE5E5
+
+  class ディーラー #CBFDFF
+  class デッキ #DCCBFF
+  class 1枚手札に配る #CBFFCB
+  class プレイヤーがhitしたら #FFE5E5
+  class ゲーム開始したら #FFE5E5
+  note right: 2回行い、そのうち1枚はAを配る
+
+  class シュミレーター #CBFDFF
+  class プレイヤーA #DCCBFF
+  class プレイヤーB #DCCBFF
+  class 勝敗 #DCCBFF
+  class ゲーム開始 #CBFFCB
+  note right: 1万回
+  class 比較 #CBFFCB
+  class 両プレイヤーがstayしたら #FFE5E5
+
+  class カード
+  note right: ・数値とスートを持っている\n・Aは1 or 11 として計算する
+
+  プレイヤー -- 手札
+  プレイヤー -- hit
+  プレイヤー -- stay
+  hit -- 合計点数が15以下
+  stay -- 合計点数が16以上
+  手札 -- 合計点数
+
+  カード -- 手札
+  カード -- デッキ
+
+  ディーラー -- デッキ
+  ディーラー -- 1枚手札に配る
+  1枚手札に配る -- プレイヤーがhitしたら
+  1枚手札に配る -- ゲーム開始したら
+
+  シュミレーター -- プレイヤーA
+  シュミレーター -- プレイヤーB
+  シュミレーター -- 勝敗
+  プレイヤーA --> プレイヤー
+  プレイヤーB --> プレイヤー
+  シュミレーター -- ゲーム開始
+  シュミレーター -- 比較
+  比較 -- 両プレイヤーがstayしたら
+  比較 -- 勝敗
+  比較 -- 合計点数
+}
+
+@enduml
