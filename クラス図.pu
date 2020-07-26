@@ -1,0 +1,48 @@
+@startuml
+left to right direction
+title BlackJackクラス図
+
+package Domain {
+  class Player #CBFDFF {
+    + hand: Card
+    --
+    + hit(): Card
+    + stand()
+  }
+
+  class Dealer #CBFDFF {
+    + deck: Card
+    --
+    + distributeOneCard()
+  }
+
+  class Card #CBFDFF {
+    number
+    suit
+  }
+  note right: numberは52まで\nsuitはSpade, Heart, Diamond, Clubがある
+}
+
+package UseCase {
+  class BlackJackSimulator {
+    + simulate(): result
+  }
+
+  class CompareUseCase {
+    compare()
+  }
+}
+
+package Presentation {
+  class BlackJackResult {
+  }
+}
+
+BlackJackResult -- BlackJackSimulator
+BlackJackSimulator -- CompareUseCase
+CompareUseCase -- Player
+CompareUseCase -- Dealer
+Player -- Card
+Dealer -- Card
+
+@enduml
