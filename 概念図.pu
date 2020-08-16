@@ -13,16 +13,26 @@ rectangle オブジェクト図 {
 
   rectangle システム {
     class ブラックジャック
+    note right of ブラックジャック
+      ゲームを開始し、勝敗結果を取得する
+    endnote
     class ディーラー
     class プレイヤー
     class デッキ
-    class 手札
     class カード
-    note top: ・数値とスートを持っている\n・Aは1 or 11 として計算する
+    note bottom of カード
+      ・数値とスートを持っている
+      ・Aは1 or 11 として計算する
+    endnote
+    class 手札
+    class 手札カード
+    note bottom of 手札カード
+      カードIDを持っている
+    endnote
     class hit
     note bottom: '合計点数が15以下'
     class stay
-    note right: '合計点数が16以上'
+    note bottom: '合計点数が16以上'
     class 合計数値
     class 比較
     note top: '両プレイヤーがstayしたら'
@@ -30,19 +40,20 @@ rectangle オブジェクト図 {
 
     class 1枚手札に配る
     note bottom of 1枚手札に配る
+      プレイヤーに配る
       ・ゲーム開始時は2回配る
-        ・そのうち1枚はAを配る
       ・プレイヤーがhitした時
     endnote
-    class ゲーム開始
+    class 配布ルール
+    note bottom of 配布ルール
+      ・最初のユーザーにはAを配る
+    endnote
   }
   シュミレーター -- ブラックジャック
-  ブラックジャック ... ゲーム開始
-  ブラックジャック -down- ディーラー
-  ブラックジャック -down- プレイヤー
-
-  ゲーム開始 -- 1枚手札に配る
-  ゲーム開始 -- 比較
+  ブラックジャック -- ディーラー
+  ブラックジャック -- プレイヤー
+  ブラックジャック -- 比較
+  ブラックジャック -- 勝敗
 
   比較 -- 勝敗
   比較 -- 合計数値
@@ -53,10 +64,10 @@ rectangle オブジェクト図 {
 
   ディーラー -- デッキ
   ディーラー -- 1枚手札に配る
-  1枚手札に配る -- プレイヤー
+  1枚手札に配る -- 配布ルール
 
-  カード -- 手札
-  カード -- デッキ
+  手札カード -up- 手札
+  カード -up- デッキ
 }
 
 @enduml

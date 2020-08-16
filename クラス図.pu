@@ -28,107 +28,42 @@ package Application {
   }
   note left of BlackJack::startGame
     1. ディーラーの準備
-      PrepareDealer.prepare()
-      準備の中でディーラーがカードをシャッフルする
-    2. プレイヤーの準備
-      PreparePlayer.prepare()
-    3. ディーラーがカードを配る
-      HandOutCards.handOutCards(dealer, players)
-    4. Playerのアクション
-      PlayersAction.action(dealer, players)
-    5. 手札の比較
-      Compare.compare(players)
+      dealer = Dealer()
+    2. デッキのシャッフル
+      dealer.deckCreate()
+      dealer.shuffle()
+    3. プレイヤーの準備
+      player = Player()
+    4. ディーラーがカードを配る
+      player.addCard(dealer.distributeOneCard(DistributionRules))
+    5. Playerのアクション
+      if player.totalNumber => 16
+        player.stay()
+      elseif players.totalNumber < 16
+        player.hit()
+      end
+    6. 手札を比較しResultを返す
+      compare(players)
   endnote
-
-  note as memo #FFE5E5
-    ディーラーやプレイヤー、ハンドやデッキは
-    1回のゲーム内で一意である必要がありそう。
-
-    シングルトンとかにした方がいいのか？
-  endnote
-  memo .. BlackJack
-
-  rectangle BlackJackUseCase {
-    class PrepareDealer {
-      + prepare(): Dealer
-    }
-
-    class PreparePlayer {
-      + prepare(): Player
-    }
-
-    note as factory
-      Factory用意した方がいいのか？
-    endnote
-
-    PrepareDealer .. factory
-    PreparePlayer .. factory
-
-    class HandOutCards {
-      + handOutCards(Dealer dealer, Array<Player> players)
-    }
-
-    note bottom of HandOutCards
-      ゲーム開始時は手札を2枚配る
-      最初のプレイヤーには A を配る
-
-      handOutCards(Dealer dealer, Array<Player> players) {
-        players for player {
-          if 最初だったら
-            player.hand.addCard(dealer.distributeOneCard(aceFlag))
-            player.hand.addCard(dealer.distributeOneCard())
-          else
-            player.hand.addCard(dealer.distributeOneCard())
-            player.hand.addCard(dealer.distributeOneCard())
-          end
-        }
-      }
-    endnote
-
-    class PlayersAction {
-      + action(Dealer dealer, Array<Player> players)
-    }
-    note bottom of PlayersAction
-      自分の手札の条件によって
-      hit もしくは stayを行う。
-
-      全プレイヤーがstay
-      となったら終了
-    endnote
-
-    class Compare {
-      + compare(Array<Player> players)
-    }
-    note bottom of Compare
-      手札のtotalNumberを比較し、
-      Resultを返却する
-    endnote
-  }
 }
 
 package Domain {
-  package Entity {
-    class Player #CBFDFF {
-      + {static} hand: Hand
-      --
-      + hit(): Card
-      + stand(): Boolean
-    }
-
+  package Dealer {
     class Dealer #CBFDFF {
-      + {static} deck: Deck
+      + deck: Deck
       --
+      + createDeck(): void
       + shuffle(): void
-      + distributeOneCard(aceFlag): Card
+      + distributeOneCard(DistributionRules): Card
     }
     note right of Dealer::distributeOneCard
-      引数があればAを返す
+      ルールがなければランダムに配布する
+      ルールがあればそのルールに従い
+      カードを配布する
     endnote
-  }
 
-  package ValueObject {
     class Deck #CBFDFF {
-      + {static} cards: Array<Card>
+      + cards: Array<Card>
       ---
       + shuffle(): void
       - create(): void
@@ -136,16 +71,6 @@ package Domain {
     note right of Deck::create
       コンストラクタで実行し、デッキに必要なCardを
       cardsプロパティにCardを追加する
-    endnote
-
-    class Hand #CBFDFF {
-      + {static} cards: Array<Card>
-      ---
-      + addCard(): void
-      + totalNumber(): Integer
-    }
-    note right of Hand::totalNumber
-      手札の合計numberを返す
     endnote
 
     class Card #CBFDFF {
@@ -159,40 +84,65 @@ package Domain {
       Jokerは入れてない
     endnote
 
-    class Result #CBFDFF {
+    package SimulatorRules {
+      interface DistributionRules {
+        distribute(Deck): Card
+      }
+
+      class DistributeAce {
+        distribute(Deck): Card
+      }
+    }
+  }
+
+  package Player {
+    class Player #CBFDFF {
+      + {static} hand: Hand
+      + actionStatus: Boolean
+      --
+      + hit(): Card
+      + stay(): void
+    }
+
+    class Hand #CBFDFF {
+      + {static} cards: Array<Card>
+      ---
+      + addCard(): void
+      + totalNumber(): Integer
+    }
+    note right of Hand::totalNumber
+      手札の合計numberを返す
+      Aは1もしくは11として扱う
+    endnote
+
+    class HandCards #CBFDFF {
+    }
+    note right of HandCards
+      CardのIDを持っている
+    endnote
+  }
+
+  class Result #CBFDFF {
     + isWin(): boolean
     + isLoose(): boolean
     + isDrow(): boolean
-  }
   }
 }
 
 
 BlackJackResult -- BlackJackSimulator
+
 BlackJackSimulator -- BlackJack
+BlackJack -- Player
+BlackJack -- Dealer
+BlackJack -- Result
 
-BlackJack -- PrepareDealer
-BlackJack -- PreparePlayer
-BlackJack -- HandOutCards
-BlackJack -- PlayersAction
-BlackJack - Compare
-
-Compare -right- Result
-
-' PrepareDealer -- Player
-' PrepareDealer -- Dealer
-' PreparePlayer -- Player
-' PreparePlayer -- Dealer
-' HandOutCards -- Player
-' HandOutCards -- Dealer
-' PlayersAction -- Player
-' PlayersAction -- Dealer
-' CompareUseCase -- Player
-' CompareUseCase -- Dealer
+DistributionRules <|.. DistributeAce
+Dealer::distributeOneCard -- DistributionRules
 
 Player -- Hand
+Hand -- HandCards
 Dealer -- Deck
-Hand -- Card
 Deck -- Card
 
 @enduml
