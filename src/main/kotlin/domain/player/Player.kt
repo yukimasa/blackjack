@@ -1,10 +1,12 @@
 package domain.player
 
+import domain.blackjack.Action
 import domain.card.Card
+import domain.player.Hand.Companion.BUSTED
 
 class Player {
     var hand = Hand()
-    var canAction = true
+    var isBusted = false
 
     fun addCardToHand(card: Card) {
         hand.addCard(card)
@@ -14,19 +16,22 @@ class Player {
         return hand.totalNumber()
     }
 
-    fun action(card: Card) {
-        if (hand.totalNumber() < 16) {
-            hit(card)
-        } else {
-            stay()
+    fun action(): Action {
+        return when {
+            hand.totalNumber() < 16 -> {
+                Action.HIT
+            }
+            hand.totalNumber() == BUSTED -> {
+                busted()
+                Action.STAY
+            }
+            else -> {
+                Action.STAY
+            }
         }
     }
 
-    private fun hit(card: Card) {
-        addCardToHand(card)
-    }
-
-    private fun stay() {
-        canAction = false
+    private fun busted() {
+        isBusted = true
     }
 }

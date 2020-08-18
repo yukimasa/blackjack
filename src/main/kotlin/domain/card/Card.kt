@@ -3,10 +3,10 @@ package domain.card
 class Card(val rank: Rank, val suit: Suit) {
     fun number(): Int {
         return when {
-            rank.number == Rank.ACE.number -> {
+            isAce() -> {
                 1
             }
-            isFaceCard(rank) -> {
+            isFaceCard() -> {
                 10
             }
             else -> {
@@ -15,14 +15,11 @@ class Card(val rank: Rank, val suit: Suit) {
         }
     }
 
-    private fun isFaceCard(rank: Rank): Boolean {
-        if (
-            rank.number == Rank.JACK.number ||
-            rank.number == Rank.QUEEN.number ||
-            rank.number == Rank.KING.number
-        ) {
-            return true
-        }
-        return false
+    fun isAce(): Boolean {
+        return rank.number == Rank.ACE.number
+    }
+
+    private fun isFaceCard(): Boolean {
+        return rank.number == Rank.JACK.number || rank.number == Rank.QUEEN.number || rank.number == Rank.KING.number
     }
 }

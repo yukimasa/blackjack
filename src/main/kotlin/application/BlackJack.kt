@@ -1,50 +1,73 @@
 package application
 
 import domain.GameResult
+import domain.blackjack.Action
 import domain.dealer.Dealer
 import domain.dealer.simulator_rules.DistributeAce
 import domain.player.Player
 
 class BlackJack {
-    fun startGame(): GameResult {
-        // ディーラーとプレイヤーを準備
-        val dealer = Dealer()
-        val player1 = Player()
-        val player2 = Player()
-        val distributeAce = DistributeAce()
+    // ディーラーとプレイヤーを準備
+    private val dealer = Dealer()
+    private val player1 = Player()
+    private val player2 = Player()
+    private val distributeAce = DistributeAce()
 
+    fun startGame(): GameResult {
         // ディーラーがデッキをシャッフル
         dealer.shuffle()
 
         // ディーラーがプレイヤーにカードを配る
+        handOutCards()
+
+        // プレイヤーのアクション
+        playersAction()
+
+        // 手札の比較
+        return compare()
+    }
+
+    private fun handOutCards() {
         player1.addCardToHand(dealer.distributeOneCard(distributeAce))
         player1.addCardToHand(dealer.distributeOneCard())
         player2.addCardToHand(dealer.distributeOneCard())
         player2.addCardToHand(dealer.distributeOneCard())
-
-        // プレイヤーのアクション
-        while (player1.canAction) {
-            player1.action(dealer.distributeOneCard())
-        }
-
-        while (player2.canAction) {
-            player2.action(dealer.distributeOneCard())
-        }
-
-        // 手札の比較
-        return compare(player1, player2)
     }
 
-    private fun compare(player1: Player, player2: Player): GameResult {
-        return when {
-            player1.totalNumberOfHands() > player2.totalNumberOfHands() -> {
-                GameResult(isWin = true)
+    private fun playersAction() {
+        val players = listOf(player1, player2)
+
+        for (player in players) {
+            while (!player.isBusted) {
+                if (player.action() == Action.HIT) {
+                    player.addCardToHand(dealer.distributeOneCard())
+                } else if (player.action() == Action.STAY) {
+                    break
+                } else {
+                    break
+                }
             }
-            player1.totalNumberOfHands() == player2.totalNumberOfHands() -> {
-                GameResult(isDraw = true)
-            }
-            else -> {
-                GameResult(isLose = true)
+        }
+    }
+
+    private fun compare(): GameResult {
+        return if (!player1.isBusted && player2.isBusted) {
+            GameResult(isWin = true)
+        } else if(player1.isBusted && !player2.isBusted) {
+            GameResult(isLose = true)
+        } else if (player1.isBusted && player2.isBusted) {
+            GameResult(isDraw = true)
+        } else {
+            when {
+                (player1.totalNumberOfHands() > player2.totalNumberOfHands()) -> {
+                    GameResult(isWin = true)
+                }
+                (player1.totalNumberOfHands() == player2.totalNumberOfHands()) -> {
+                    GameResult(isDraw = true)
+                }
+                else -> {
+                    GameResult(isLose = true)
+                }
             }
         }
     }
