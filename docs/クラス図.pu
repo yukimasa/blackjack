@@ -2,147 +2,159 @@
 ' left to right direction
 title BlackJackクラス図
 
-package Presentation {
+package presentation {
   class BlackJackResult {
   }
-  note top of BlackJackResult
+  note right of BlackJackResult
     一回実行するたびに勝敗が返却されるので、
     回数はPresentationで制御する
   endnote
 }
 
-package Application {
+package application {
   class BlackJackSimulator {
     + simulate(): Result
   }
-  note left of BlackJackSimulator
+  note right of BlackJackSimulator
     simulateメソッドでBlackJackを開始し、
     最後にResultクラスを返す
   endnote
 
   class BlackJack {
     + dealer: Dealer
-    + players: Array<Player>
+    + player1: Player
+    + player2: Player
     ---
     + startGame(): Result
+    - handOutCards()
+    - playersAction()
+    - compare()
   }
-  note left of BlackJack::startGame
-    1. ディーラーの準備
-      dealer = Dealer()
-    2. デッキのシャッフル
-      dealer.deckCreate()
-      dealer.shuffle()
-    3. プレイヤーの準備
-      player = Player()
-    4. ディーラーがカードを配る
-      player.addCard(dealer.distributeOneCard(DistributionRules))
-    5. Playerのアクション
-      if player.totalNumber => 16
-        player.stay()
-      elseif players.totalNumber < 16
-        player.hit()
-      end
-    6. 手札を比較しResultを返す
-      compare(players)
+  note right of BlackJack::startGame
+    1. ディーラーがデッキをシャッフル
+    2. ディーラーがプレイヤーにカードを配る
+    3. プレイヤーのアクション
+    4. 手札の比較
   endnote
 }
 
-package Domain {
-  package Dealer {
-    class Dealer #CBFDFF {
-      + deck: Deck
-      --
-      + createDeck(): void
-      + shuffle(): void
-      + distributeOneCard(DistributionRules): Card
+package domain {
+  package blackJack {
+    enum Action {
+      HIT
+      STAY
     }
-    note right of Dealer::distributeOneCard
-      ルールがなければランダムに配布する
-      ルールがあればそのルールに従い
-      カードを配布する
-    endnote
 
-    class Deck #CBFDFF {
-      + cards: Array<Card>
-      ---
-      + shuffle(): void
-      - create(): void
+    class Result {
+      + isWin(): boolean
+      + isLoose(): boolean
+      + isDraw(): boolean
     }
-    note right of Deck::create
-      コンストラクタで実行し、デッキに必要なCardを
-      cardsプロパティにCardを追加する
-    endnote
+    package dealer {
+      class Dealer #CBFDFF {
+        + deck: Deck
+        --
+        + shuffle(): void
+        + distributeOneCard(DistributionRules): Card
+      }
+      note right of Dealer::distributeOneCard
+        ルールがなければランダムに配布する
+        ルールがあればそのルールに従い
+        カードを配布する
+      endnote
 
-    class Card #CBFDFF {
-      number
-      suit
+      class Deck #CBFDFF {
+        + cards: Array<Card>
+        ---
+        + shuffle(): void
+      }
+      note right of Deck
+        initでデッキに必要なCardを
+        cardsプロパティに追加する
+      endnote
     }
-    note right of Card
-      numberは52まで
-      suitはSpade, Heart, Diamond, Clubがある
 
-      Jokerは入れてない
-    endnote
-
-    package SimulatorRules {
-      interface DistributionRules {
-        distribute(Deck): Card
+    package player {
+      class Player #CBFDFF {
+        + hand: Hand
+        + isBusted: Boolean
+        ---
+        + addCardToHand(Card)
+        + totalNumberOfHands(): Int
+        + action(): Action
+        - busted()
       }
 
-      class DistributeAce {
-        distribute(Deck): Card
+      class Hand #CBFDFF {
+        + cards: Array<Card>
+        ---
+        + addCard(Card): void
+        + totalNumber(): Int
+      }
+      note left of Hand::totalNumber
+        手札の合計numberを返す
+        Aは1もしくは11として扱う
+      endnote
+    }
+
+    package card {
+      class Card #CBFDFF {
+        + rank: Rank
+        + suit: Suit
+        ---
+        + number()
+        + isAce()
+        - isFaceCard()
+      }
+      note right of Card
+        - Jokerは入れてない
+        - number()は1〜10の数値を返す
+      endnote
+
+      enum Rank {}
+      note left of Rank
+        numberは52まで
+      endnote
+
+      enum Suit {
+        SPADE
+        HEART
+        DIAMOND
+        CLUB
       }
     }
+
   }
 
-  package Player {
-    class Player #CBFDFF {
-      + {static} hand: Hand
-      + actionStatus: Boolean
-      --
-      + hit(): Card
-      + stay(): void
+  package simulatorRules {
+    interface DistributionRules {
+      distribute(Deck): Card
     }
 
-    class Hand #CBFDFF {
-      + {static} cards: Array<Card>
-      ---
-      + addCard(): void
-      + totalNumber(): Integer
+    class DistributeAce {
+      distribute(Deck): Card
     }
-    note right of Hand::totalNumber
-      手札の合計numberを返す
-      Aは1もしくは11として扱う
-    endnote
-
-    class HandCards #CBFDFF {
-    }
-    note right of HandCards
-      CardのIDを持っている
-    endnote
-  }
-
-  class Result #CBFDFF {
-    + isWin(): boolean
-    + isLoose(): boolean
-    + isDrow(): boolean
   }
 }
 
-
 BlackJackResult -- BlackJackSimulator
-
 BlackJackSimulator -- BlackJack
 BlackJack -- Player
 BlackJack -- Dealer
 BlackJack -- Result
 
-DistributionRules <|.. DistributeAce
-Dealer::distributeOneCard -- DistributionRules
-
 Player -- Hand
-Hand -- HandCards
+Player -left- Action
+Hand -- Card
+
 Dealer -- Deck
 Deck -- Card
+
+Card -- Rank
+Card -- Suit
+
+DistributionRules <|.. DistributeAce
+Dealer::distributeOneCard -- DistributionRules
+DistributionRules -- Card
 
 @enduml

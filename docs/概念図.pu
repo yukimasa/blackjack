@@ -25,10 +25,7 @@ rectangle オブジェクト図 {
       ・Aは1 or 11 として計算する
     endnote
     class 手札
-    class 手札カード
-    note bottom of 手札カード
-      カードIDを持っている
-    endnote
+    class アクション
     class hit
     note bottom: '合計点数が15以下'
     class stay
@@ -59,14 +56,18 @@ rectangle オブジェクト図 {
   比較 -- 合計数値
 
   プレイヤー -- 手札
-  プレイヤー -- hit
-  プレイヤー -- stay
+  プレイヤー -- アクション
+
+  手札 -- カード
+
+  アクション -- hit
+  アクション -- stay
 
   ディーラー -- デッキ
   ディーラー -- 1枚手札に配る
+
   1枚手札に配る -- 配布ルール
 
-  手札カード -up- 手札
   カード -up- デッキ
 }
 
