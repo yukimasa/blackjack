@@ -1,7 +1,6 @@
-package domain.player
+package domain.blackjack.player
 
-import domain.card.Card
-import domain.card.Rank
+import domain.blackjack.card.Card
 
 class Hand {
     companion object {

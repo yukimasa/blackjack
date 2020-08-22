@@ -1,8 +1,8 @@
-package domain.dealer
+package domain.blackjack.dealer
 
-import domain.card.Card
-import domain.card.Rank
-import domain.card.Suit
+import domain.blackjack.card.Card
+import domain.blackjack.card.Rank
+import domain.blackjack.card.Suit
 
 class Deck {
     var cards = mutableSetOf<Card>()

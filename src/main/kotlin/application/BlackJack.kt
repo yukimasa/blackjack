@@ -1,10 +1,10 @@
 package application
 
-import domain.GameResult
+import domain.blackjack.GameResult
 import domain.blackjack.Action
-import domain.dealer.Dealer
-import domain.dealer.simulator_rules.DistributeAce
-import domain.player.Player
+import domain.blackjack.dealer.Dealer
+import domain.simulator_rules.DistributeAce
+import domain.blackjack.player.Player
 
 class BlackJack {
     // ディーラーとプレイヤーを準備

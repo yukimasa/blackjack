@@ -1,8 +1,8 @@
-package domain.player
+package domain.blackjack.player
 
 import domain.blackjack.Action
-import domain.card.Card
-import domain.player.Hand.Companion.BUSTED
+import domain.blackjack.card.Card
+import domain.blackjack.player.Hand.Companion.BUSTED
 
 class Player {
     var hand = Hand()

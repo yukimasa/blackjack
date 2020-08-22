@@ -1,4 +1,4 @@
-package domain.card
+package domain.blackjack.card
 
 class Card(val rank: Rank, val suit: Suit) {
     fun number(): Int {

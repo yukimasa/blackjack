@@ -1,7 +1,7 @@
-package domain.dealer.simulator_rules
+package domain.simulator_rules
 
-import domain.card.Card
-import domain.dealer.Deck
+import domain.blackjack.card.Card
+import domain.blackjack.dealer.Deck
 
 class DistributeAce : DistributionRules {
     override fun distribute(deck: Deck): Card {

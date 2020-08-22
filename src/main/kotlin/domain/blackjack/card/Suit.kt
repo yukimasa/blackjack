@@ -1,4 +1,4 @@
-package domain.card
+package domain.blackjack.card
 
 enum class Suit {
     SPADE,

@@ -1,4 +1,4 @@
-package domain.card
+package domain.blackjack.card
 
 enum class Rank(val number :Int) {
     ACE(1),

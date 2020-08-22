@@ -1,7 +1,7 @@
-package domain.dealer
+package domain.blackjack.dealer
 
-import domain.card.Card
-import domain.dealer.simulator_rules.DistributionRules
+import domain.blackjack.card.Card
+import domain.simulator_rules.DistributionRules
 
 class Dealer {
     var deck = Deck()

@@ -1,6 +1,6 @@
 package application
 
-import domain.GameResult
+import domain.blackjack.GameResult
 
 class BlackJackSimulator {
     fun simulate(): GameResult {
